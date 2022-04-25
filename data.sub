@@ -1,0 +1,20 @@
+# Before running this with "condor_submit myscript.sub", the
+# directories log, error, and output must exist.
+
+universe = vanilla
+log    =    log/hw4-chtc_$(Cluster)_$(Process).log
+error  =  error/hw4-chtc_$(Cluster)_$(Process).err
+output = output/hw4-chtc_$(Cluster)_$(Process).out
+
+executable = ./data.sh
+arguments = $(json)
+
+should_transfer_files = YES
+when_to_transfer_output = ON_EXIT
+transfer_input_files = R402.tar.gz, packages_jsonlite.tar.gz, data.R, $(json)
+
+request_cpus = 1
+request_memory = 100MB
+request_disk = 500MB
+
+queue json from json_files
