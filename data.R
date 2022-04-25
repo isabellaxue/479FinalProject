@@ -2,25 +2,15 @@ rm(list=ls())
 
 args = (commandArgs(trailingOnly=TRUE))
 if(length(args) == 1){
-  RpackagesDir = args[1]
+  filename = args[1]
 } else {
-  cat('usage: Rscript singleR.R <RpackagesDir>\n', file=stderr())
+  cat('usage: Rscript data.R <filename>\n', file=stderr())
   stop()
 }
 
-# Tell R to search in RpackagesDir, in addition to where it already
-# was searching, for installed R packages.
-.libPaths(new=c(RpackagesDir, .libPaths()))
-if (!require("jsonlite")) { # If loading package fails ...
-  # Install package in RpackagesDir.
-  install.packages(pkgs="jsonlite", lib=RpackagesDir, repos="https://cran.r-project.org")
-  stopifnot(require("jsonlite")) # If loading still fails, quit.
-}
-
-#Code
 library(jsonlite)
 
-raw <- readLines("F1.json")
+raw <- readLines(filename)
 
 # add missing comma after }
 n <- length(raw)
@@ -34,6 +24,3 @@ df2 <- apply(df,2,as.character)
 df<- data.frame(df2)
 
 head(df)
-
-
-
