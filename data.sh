@@ -1,8 +1,9 @@
 #!/bin/bash
 
-# untar your R and jsonlite installation
+# untar your R installation
 tar -xzf R402.tar.gz
-tar -xzf packages_jsonlite.tar.gz
+#use package jsonlite, tidytext, tidyverse
+tar -xzf packages_jsonlite_tidys.tar.gz
 
 # make sure the script will use your R installation,
 # and the working directory as its home location
