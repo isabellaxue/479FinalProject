@@ -1,7 +1,7 @@
 #!/bin/bash
 tar -xzf R402.tar.gz
-#use package wordcloud2, stopwords
-tar -xzf packages_cloud_color_stop.tar.gz
+#use package wordcloud2, 
+tar -xzf packages_question.tar.gz
 
 export PATH=$PWD/R/bin:$PATH
 export RHOME=$PWD/R
