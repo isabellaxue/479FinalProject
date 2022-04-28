@@ -12,7 +12,7 @@ if(length(args) == 3){
 }
 
 library(wordcloud2)
-library(stopwords)
+library(htmlwidgets)
 
 #Question 1
 df_both_model <- read.csv(df_q1, header = TRUE)
@@ -42,6 +42,7 @@ nrc_df$Positive_p <- nrc_table$coefficients[8,4]
 nrc_df$Disgust_p <- nrc_table$coefficients[9,4]
 nrc_df$Joy_p <- nrc_table$coefficients[10,4]
 nrc_df$Anticipation_p <- nrc_table$coefficients[11,4]
+
 #Question 3
 cloud_n <- wordcloud2(df_q3_n, color = "random-light", backgroundColor = "black")
 cloud_y <- wordcloud2(words_yes,  color='random-light', backgroundColor="grey")
