@@ -1,21 +1,20 @@
 rm(list=ls())
 
-# args = (commandArgs(trailingOnly=TRUE))
-# if(length(args) == 1){
-#   filename = args[1]
-# } else {
-#   cat('usage: Rscript data.R <filename>\n', file=stderr())
-#   stop()
-# }
+args = (commandArgs(trailingOnly=TRUE))
+if(length(args) == 1){
+  filename = args[1]
+} else {
+  cat('usage: Rscript data.R <filename>\n', file=stderr())
+  stop()
+}
 
 library(jsonlite)
 library(tidytext)
 library(tidyverse)
-library(htmlwidgets)
 library(stopwords)
 
 #Read json into dataframe
-filename = 'J1.json'
+
 raw <- readLines(filename)
 
 # add missing comma after }
