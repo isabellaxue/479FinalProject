@@ -23,8 +23,13 @@ raw[-n] <- gsub("}", "},", raw[-n])
 raw <- c("[", raw, "]")
 
 table <- jsonlite::fromJSON(raw, simplifyVector = FALSE)
-df <- as.data.frame(do.call(rbind, table))
-#df2 <- apply(df,2,as.character)
+table1 <- list()
+for (i in 1:length(table)){
+  if (length(table[[i]])==9) {
+    table1 <- append(table1, list(table[[i]]))
+  }
+}
+df <- as.data.frame(do.call(rbind, table1))
 df<- data.frame(df)
 
 #Tokenize reviews 
