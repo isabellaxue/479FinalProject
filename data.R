@@ -12,6 +12,7 @@ library(jsonlite)
 library(tidytext)
 library(tidyverse)
 library(stopwords)
+library(textdata)
 
 #Read json into dataframe
 raw <- readLines(filename)
