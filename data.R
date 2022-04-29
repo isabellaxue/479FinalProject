@@ -14,7 +14,6 @@ library(tidyverse)
 library(stopwords)
 
 #Read json into dataframe
-
 raw <- readLines(filename)
 
 # add missing comma after }
@@ -29,11 +28,11 @@ df <- as.data.frame(do.call(rbind, table))
 df<- data.frame(df)
 
 #Tokenize reviews 
-df1 <- df[1:10000, c(4, 5, 6)]
+df1 <- df[, c(4, 5, 6)]
 
 pos <- list()
 neg <- list()
-for (i in 1:10000){
+for (i in 1:nrow(df1)){
   pos <- append(pos,df1$helpful[i][[1]][[1]])
   neg <- append(neg,df1$helpful[i][[1]][[2]]-df1$helpful[i][[1]][[1]])
 }
@@ -46,8 +45,6 @@ df1$neg <- neg
 df1$diff <- unlist(df1$pos) - unlist(df1$neg)
 df1 <- df1 %>% mutate(rate = case_when(diff > 0 ~ 1, diff <= 0 ~ 0))
 df1$row_num <- seq.int(nrow(df1))
-length(which(df1$rate == 0)) #number of negative rate
-length(which(df1$rate == 1)) #number of positive rate
 
 # yes_token <- df1 %>% filter(rate == 1) %>% unnest_tokens(word, reviewText)
 # no_token <- df1 %>% filter(rate == 0) %>% unnest_tokens(word, reviewText)
@@ -76,7 +73,8 @@ df_helpful_yes = df_token_yes %>%
   left_join(word_num_yes) %>% mutate(prop = bingWords/count)
 
 df_helpful_yes = df_helpful_yes[6]
-df_helpful_yes$rate = rep(1, length(which(df1$rate == 1)))
+#df_helpful_yes$rate = rep(1, length(which(df1$rate == 1)))
+df_helpful_yes$rate = rep(1, nrow(df_helpful_yes))
 
 df_helpful_no = df_token_no %>% 
   left_join(bing) %>% 
@@ -87,7 +85,7 @@ df_helpful_no = df_token_no %>%
   left_join(word_num_no) %>% mutate(prop = bingWords/count)
 
 df_helpful_no = df_helpful_no[6]
-df_helpful_no$rate = rep(0, length(which(df1$rate == 0)))
+df_helpful_no$rate = rep(0, nrow(df_helpful_no))
 
 df_both_model = rbind(df_helpful_no, df_helpful_yes)
 write_csv(df_both_model, paste("bing_",gsub(".json","",x=filename),".csv",sep = ""))
@@ -117,7 +115,7 @@ nrc_yes = df_token_yes %>%
     nrcanticipation = sum(anticipation, na.rm=T)
   )
 
-nrc_yes$rate = rep(1, length(which(df1$rate == 1)))
+nrc_yes$rate = rep(1, nrow(df_helpful_yes))
 
 nrc_no = df_token_no %>% 
   left_join(nrcWide) %>% 
@@ -135,7 +133,7 @@ nrc_no = df_token_no %>%
     nrcanticipation = sum(anticipation, na.rm=T)
   )
 
-nrc_no$rate = rep(0, length(which(df1$rate == 0)))
+nrc_no$rate = rep(0, nrow(df_helpful_no))
 nrc_both = rbind(nrc_yes, nrc_no)
 write_csv(nrc_both, paste("nrc_",gsub(".json","",x=filename),".csv",sep = ""))
 
