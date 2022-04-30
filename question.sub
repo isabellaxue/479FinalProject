@@ -1,0 +1,20 @@
+# Before running this with "condor_submit myscript.sub", the
+# directories log, error, and output must exist.
+
+universe = vanilla
+log    =    log/question-chtc_$(Cluster)_$(Process).log
+error  =  error/question-chtc_$(Cluster)_$(Process).err
+output = output/question-chtc_$(Cluster)_$(Process).out
+
+executable = ./question.sh
+#arguments = $(json)
+
+should_transfer_files = YES
+when_to_transfer_output = ON_EXIT
+transfer_input_files = R402.tar.gz, packages_all.tar.gz, question.R, bing.csv, nrc.csv, wordcloud_n.csv, wordcloud_y.csv  
+
+request_cpus = 1
+request_memory = 1GB
+request_disk = 1GB
+
+queue 1
