@@ -12,9 +12,9 @@ library(jsonlite)
 library(tidytext)
 library(tidyverse)
 library(stopwords)
-library(textdata)
 
 #Read json into dataframe
+#filename <- "J16.json"
 raw <- readLines(filename)
 
 # add missing comma after }
@@ -94,10 +94,13 @@ df_helpful_no = df_helpful_no[6]
 df_helpful_no$rate = rep(0, nrow(df_helpful_no))
 
 df_both_model = rbind(df_helpful_no, df_helpful_yes)
+#names(df_both_model) <- NULL
 write_csv(df_both_model, paste("bing_",gsub(".json","",x=filename),".csv",sep = ""))
 
-
 #Question 2-NRC
+tns <- getNamespace("textdata")
+assignInNamespace(x = "printer", value = function(...) 1, ns = tns)
+
 nrc = get_sentiments("nrc") %>% 
   rename(nrc = sentiment)
 
@@ -141,6 +144,7 @@ nrc_no = df_token_no %>%
 
 nrc_no$rate = rep(0, nrow(df_helpful_no))
 nrc_both = rbind(nrc_yes, nrc_no)
+#names(nrc_both) <- NULL
 write_csv(nrc_both, paste("nrc_",gsub(".json","",x=filename),".csv",sep = ""))
 
 #Question 3-wordcloud
@@ -166,5 +170,10 @@ words_yes <- yes_token_1 %>% count(word,sort=TRUE)
 words_no <- no_token_1 %>% count(word,sort=TRUE)
 
 #creating wordclouds
-write_csv(words_yes, paste("wordcloud_y_",gsub(".json","",x=filename),".csv",sep = ""))
-write_csv(words_no, paste("wordcloud_n_",gsub(".json","",x=filename),".csv",sep = ""))
+#colnames(words_yes) = NULL
+#colnames(words_no) = NULL
+
+write_csv(words_yes, paste("wordcloud_y_",gsub(".json","",x=filename),".csv"),
+          col_names = F)
+write_csv(words_no, paste("wordcloud_n_",gsub(".json","",x=filename),".csv"),
+          col_names = F)
