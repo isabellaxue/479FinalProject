@@ -1,0 +1,131 @@
+---
+title: "STAT479 Final project"
+output: html_document
+author: "Group Foxtrot: Ruohe Zhou, Isabella Xue, Iris Chow, Yaqi Jie"
+---
+
+<style type="text/css">
+  body{
+  font-size: 12pt;
+}
+h1.title {
+  font-size: 38px;
+  color: Black;
+  text-align: center;
+}
+h4.author { /* Header 1 - and the author and data headers use this too  */
+    font-size: 16px;
+  text-align: center;
+}
+}
+</style>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(wordcloud2)
+library(htmlwidgets)
+library(webshot)
+```
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE, warning=FALSE, message=FALSE)
+```
+
+## Introduction
+
+In this project, we used 142.8 million amazon reviews from 1996 to 2014 to evaluate the level of helpfulness in a product review using sentiment analysis. We split the data into subfiles and computed the helpfulness and categorized emotion of reviews by running  parallel jobs on CHTC. 
+
+Our objective is to study the relationship between the emotions in Amazon product reviews and the helpfulness of the review themselves. The following are our research questions:
+
+1. Is being emotional related to helpfulness of the review?
+2. If yes, what kind of emotion is associated with whether the review is helpful?
+3. What are the most frequent words shown in helpful vs. unhelpful reviews?
+
+We found that being emotional is associated with the helpfulness of the review. In addition, trust, fear, negative, sadness, anger, positive, disgust, joy and anticipation emotions are all associated with whether the review is helpful. Lastly, there is no difference in between the most frequent words appear in helpful vs. unhelpful reviews. 
+
+## Data
+
+Our data comes from "Amazon product data" (http://jmcauley.ucsd.edu/data/amazon/links.html). The size of the dataset we used ("user review data") is about 60 GB. The dataset contains product reviews from Amazon, including 142.8 million reviews spanning from May 1996 to July 2014. 
+
+Note: Due to issues with quota, we only used a subset of the dataset for this draft (discussed with Professor Gillett). The final version will utilize half of the dataset (30GB).  
+
+The dataset includes customer reviews with variables: `reviewerID`, `asin`, `reviewerName`, `helpful`, `reviewText`, `overall`, `summary`, `unixReviewTime`, `reviewTime.` In our project, we only used two variables, `reviewText` (text of the review) and `helpful` ( helpfulness rating of the review), in our project. 
+
+## Statistical computation
+
+We first decompressed the gzip file and split it into 60 smaller files, with each subfile containing 10000 reviews. We performed 60 parallel jobs on chtc, and we requested 1GB memory and 700MB disk for each job. Each job finished less than one minute. 
+
+In the data.R file, we read each sub-JSON file into data frames using `jsonlite` package in R. We read in all lines, added missing brackets and commas, and imported the cleaned lines into a data frame. Since some of the reviews contain only 8 values instead of 9, we removed these rows for consistency. 
+
+We transformed the helpfulness rate variable to a binary variable in which 1 signified a comment as helpful and 0 as unhelpful. Tokenization was first implemented to convert sentences into individual words, and Bing lexicon was later applied to calculate the emotional intensity of each review by dividing the number of emotional words(both positive and negative) in each comment by the total number of words of each comment. To dive deeper into figuring out which specific kind of emotion is correlated to whether the review is helpful, we applied the NRC lexicon, which contains 11 types of emotion, including anger, sadness, joy, surprise, etc. We calculated the number of emotional words in each piece of review and recorded them as independent variables for the logistic regression model that we will fit in later on.
+
+We then wrote a combined.sh file to merge the Bing lexicon table and NRC lexicon table of each subfiles into two large tables and used question.R file to fit the logistic regression model using each of the two tables. We concluded whether each emotion is correlated with the helpfulness of the reviews based on the p-values in the models. Lastly, we built word clouds to determine which words are most frequently used in helpful and unhelpful reviews. 
+
+The following is the flow chart for our statistical computation: 
+
+<center>
+
+![](Flowchart.jpg)
+
+</center>
+
+
+## Result
+
+Question 1: *Is being emotional related to the helpfulness of the review?*
+
+<center>
+
+![Result of logistic regression in question 1](LogisticRegression_q1.png)
+
+</center>
+
+The logistic regression gave a p-value smaller than 2e-16, which is smaller than 0.05. Therefore we conclude that the emotion intensity of a product review is significantly associated with the helpfulness of the review. Since the answer to the first research question is yes, we proceed to the next question. 
+
+Question 2: *What kind of emotion is associated with whether the review is helpful?*
+
+<center>
+
+![Result of logistic regression in question 2](LogisticRegression_q2.png)
+
+</center>
+
+The second logistic regression model showed the association between different kinds of emotion and the helpfulness of the review. Among the ten emotions, all but one (surprise) had a p-value smaller than 0.05: trust, fear, negative, sadness, anger, positive, disgust, joy, and anticipation. Therefore, we conclude that trust, fear, negative, sadness, anger, positive, disgust, joy, and anticipation are all associated with whether the review is helpful. 
+
+Question 3: *What are the most frequent words shown in helpful vs. unhelpful reviews?*
+
+* Most frequent words for unhelpful reviews
+
+```{r echo=FALSE, fig.align="center"}
+words_no <- read.csv("wordcloud_n_ J16 .csv", header = F)
+cloud_n <- wordcloud2(words_no, color = "random-light", backgroundColor = "black")
+saveWidget(cloud_n, 'cloud_n.html', selfcontained = F)
+webshot('cloud_n.html', 'cloud_n.png', vwidth=1000,vheight=900, delay = 5)
+```
+
+* Most frequent words for helpful reviews
+
+```{r echo=FALSE, fig.align="center"}
+words_yes <- read.csv("wordcloud_y_ J16 .csv", header = F)
+cloud_y <- wordcloud2(words_yes, color = "random-light", backgroundColor = "grey")
+saveWidget(cloud_y, 'cloud_y.html', selfcontained = F)
+webshot('cloud_y.html', 'cloud_y.png', vwidth=1000,vheight=900, delay = 5)
+```
+
+The wordclouds for helpful and unhelpful reviews are similar, judging by eyes. For the unhelpful reviews, the most frequent words are book, great, like, good, love, well, read, etc. For the helpful reviews, the most frequent words are book, like, great, well, good, time, read, etc. Although there’s no visible difference between them, we noticed that the most frequent words in both helpful and unhelpful reviews were likely to come from book reviews. We conclude that there is no visible difference between the most frequent words in helpful vs. unhelpful reviews. 
+
+One weakness of our work is that we only judged the difference between the most frequent words in helpful and unhelpful reviews by comparing two images. Our conclusion may not be reliable because we did not compute it statistically. 
+
+## Conclusion
+
+This project aimed to examine the relationship between the emotion in product reviews and their helpfulness (rated by customers). We first examined the relationship between emotion intensity and the helpfulness of the reviews and concluded that they are associated with each other. In addition, we were interested in studying the relationship between each emotion and the helpfulness of the reviews. We found that trust, fear, negative, sadness, anger, positive, disgust, joy, and anticipation emotions are all associated with whether the review is helpful. However, we found no difference in the most frequent words in helpful vs. unhelpful reviews. Future studies can apply statistical methods to study the most frequent words in reviews and how they are related to whether or not the review is helpful. In addition, future studies can focus on whether more emotions in a review lead to more helpful or less helpful reviews. 
+
+## Link to GitHub repository
+
+`https://github.com/isabellaxue/479FinalProject.git`
+
+## References
+
+Ups and downs: Modeling the visual evolution of fashion trends with one-class collaborative filtering
+R. He, J. McAuley
+WWW, 2016
