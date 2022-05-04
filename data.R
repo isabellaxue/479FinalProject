@@ -14,8 +14,9 @@ library(tidyverse)
 library(stopwords)
 
 #Read json into dataframe
-#filename <- "J16.json"
 raw <- readLines(filename)
+#Change filename to "J_.json"
+filename <- gsub("/home/groups/STAT479_rxue8group/","",filename)
 
 # add missing comma after }
 n <- length(raw)
