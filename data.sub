@@ -1,20 +1,20 @@
-#!/bin/bash
+# Before running this with "condor_submit myscript.sub", the
+# directories log, error, and output must exist.
 
-# untar your R installation
-tar -xzf R402.tar.gz
-tar -xzf packages_all.tar.gz
+universe = vanilla
+log    =    log/project-chtc_$(Cluster)_$(Process).log
+error  =  error/project-chtc_$(Cluster)_$(Process).err
+output = output/project-chtc_$(Cluster)_$(Process).out
 
-# make sure the script will use your R installation,
-# and the working directory as its home location
-export PATH=$PWD/R/bin:$PATH
-export RHOME=$PWD/R
-export R_LIBS=$PWD/packages
+executable = ./data.sh
+arguments = $(json)
 
-rm log/*.log
-rm error/*.err
-rm output/*.out
+should_transfer_files = YES
+when_to_transfer_output = ON_EXIT
+transfer_input_files = R402.tar.gz, packages_all.tar.gz, data.R, $(json)
 
-# run your script
-Rscript data.R $1
-#Rscript data.R J1.json
-# note: the two actual command-line arguments are in data.sub's "arguments = " line
+request_cpus = 1
+request_memory = 1GB
+request_disk = 700MB
+
+queue json from json_files
