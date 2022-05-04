@@ -52,15 +52,15 @@ nrc_df$Anticipation_p <- format(nrc_table$coefficients[11,4], scientific = FALSE
 write.csv(nrc_df, "lr_nrc.csv")
 
 #Question 3
-#words_yes <- read.csv(df_q3_y, quote = "", sep = " ", header = F,
-#         stringsAsFactors = FALSE)
-#words_yes <- read.csv(df_q3_n, quote = "", sep = " ", header = F,
-#         stringsAsFactors = FALSE)
-#cloud_n <- wordcloud2(words_no, color = "random-light", backgroundColor = "black")
-#cloud_y <- wordcloud2(words_yes,  color='random-light', backgroundColor="grey")
+words_yes <- read.csv(df_q3_y, quote = "", sep = " ", header = F,
+         stringsAsFactors = FALSE)
+words_no <- read.csv(df_q3_n, quote = "", sep = " ", header = F,
+         stringsAsFactors = FALSE)
+cloud_n <- wordcloud2(words_no, color = "random-dark")
+cloud_y <- wordcloud2(words_yes,  color='random-dark')
 
-#saveWidget(cloud_y,"cloud_y.html",selfcontained = F)
-#saveWidget(cloud_n,"cloud_n.html",selfcontained = F)
+saveWidget(cloud_y,"cloud_y.html",selfcontained = F)
+saveWidget(cloud_n,"cloud_n.html",selfcontained = F)
 
 # and in png or pdf
 #webshot("cloud_y.html","cloud_y.png", delay =5, vwidth = 480, vheight=480)
